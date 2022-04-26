@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,21 +15,43 @@ type Genre struct {
 	Value string `json:"slug"`
 }
 
+type TraktIDs struct {
+	Trakt int    `json:"trakt"`
+	Slug  string `json:"slug"`
+	IMDB  string `json:"imdb"`
+	TMDB  int    `json:"tmdb"`
+}
+
+type ActualMovie struct {
+	Title string   `json:"title"`
+	Year  string   `json:"year"`
+	IDs   TraktIDs `json:"ids"`
+}
 type Movie struct {
+	Watchers int         `json:"watchers"`
+	Movie    ActualMovie `json:"movie"`
 }
 
 var genres []Genre
+var movies []Movie
 
-func addHeadersToRequest(req *http.Request) {
+func addGenericHeadersToRequest(req *http.Request) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("trakt-api-version", "2")
 	req.Header.Add("trakt-api-key", "97d2684afdbb32dc5306041308ad7b334c1616a124c77afb58e73eec6dc02342")
 }
 
+func addMovieFetchParams(params *url.Values, genres, page string) {
+	params.Add("limit", "30")
+	params.Add("page", page)
+	params.Add("genres", genres)
+	params.Add("extended", "full")
+}
+
 func GetMovieGenres(c *gin.Context) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://api.trakt.tv/genres/movies", nil)
-	addHeadersToRequest(req)
+	addGenericHeadersToRequest(req)
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -51,8 +74,21 @@ func GetMovieGenres(c *gin.Context) {
 
 func GetMovies(c *gin.Context) {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", "https://api.trakt.tv/genres/movies", nil)
-	addHeadersToRequest(req)
+	paramsMap := c.Request.URL.Query()
+
+	base, err := url.Parse("https://api.trakt.tv/movies/" + paramsMap.Get("subLink"))
+	if err != nil {
+		return
+	}
+	params := url.Values{}
+	addMovieFetchParams(&params, paramsMap.Get("genres"), paramsMap.Get("page"))
+
+	base.RawQuery = params.Encode()
+
+	req, err := http.NewRequest("GET", base.String(), nil)
+	addGenericHeadersToRequest(req)
+
+	fmt.Println(base.String(), req)
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -68,7 +104,7 @@ func GetMovies(c *gin.Context) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-	json.Unmarshal(bodyBytes, &genres)
+	json.Unmarshal(bodyBytes, &movies)
 
-	c.IndentedJSON(http.StatusOK, genres)
+	c.IndentedJSON(http.StatusOK, movies)
 }
