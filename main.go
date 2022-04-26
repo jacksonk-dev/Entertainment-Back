@@ -17,6 +17,7 @@ func main() {
 	})
 	router.GET("/api/genres", movies.GetMovieGenres)
 	router.GET("/api/movies", movies.GetMovies)
+	router.GET("/api/movie-image", movies.GetMovieImage)
 
 	router.Run(appPort)
 }

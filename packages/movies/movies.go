@@ -32,10 +32,19 @@ type Movie struct {
 	Movie    ActualMovie `json:"movie"`
 }
 
+type SingleImageData struct {
+	PosterPath string `json:"poster_path"`
+}
+
+type ImageData struct {
+	MovieResults []SingleImageData `json:"movie_results"`
+}
+
 var genres []Genre
 var movies []Movie
+var imageData ImageData
 
-func addGenericHeadersToRequest(req *http.Request) {
+func addTraktHeadersToRequest(req *http.Request) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("trakt-api-version", "2")
 	req.Header.Add("trakt-api-key", "97d2684afdbb32dc5306041308ad7b334c1616a124c77afb58e73eec6dc02342")
@@ -51,7 +60,7 @@ func addMovieFetchParams(params *url.Values, genres, page string) {
 func GetMovieGenres(c *gin.Context) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://api.trakt.tv/genres/movies", nil)
-	addGenericHeadersToRequest(req)
+	addTraktHeadersToRequest(req)
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -86,9 +95,7 @@ func GetMovies(c *gin.Context) {
 	base.RawQuery = params.Encode()
 
 	req, err := http.NewRequest("GET", base.String(), nil)
-	addGenericHeadersToRequest(req)
-
-	fmt.Println(base.String(), req)
+	addTraktHeadersToRequest(req)
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -107,4 +114,33 @@ func GetMovies(c *gin.Context) {
 	json.Unmarshal(bodyBytes, &movies)
 
 	c.IndentedJSON(http.StatusOK, movies)
+}
+
+func GetMovieImage(c *gin.Context) {
+	client := &http.Client{}
+	paramsMap := c.Request.URL.Query()
+
+	var tmdbKey string = "8f483886b324420ebe137ca5914f046c"
+
+	var url string = fmt.Sprintf("https://api.themoviedb.org/3/find/%s?api_key=%s&language=en-US&external_source=imdb_id", paramsMap.Get("id"), tmdbKey)
+
+	req, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	defer resp.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+	json.Unmarshal(bodyBytes, &imageData)
+
+	c.IndentedJSON(http.StatusOK, imageData)
 }
