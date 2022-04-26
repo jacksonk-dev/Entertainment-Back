@@ -12,10 +12,11 @@ func main() {
 	router := gin.Default()
 	const appPort string = ":8082"
 
-	router.GET("/", func(c *gin.Context) {
+	router.GET("/api", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": "Hello"})
 	})
-	router.GET("/movies", movies.GetMovies)
+	router.GET("/api/genres", movies.GetMovieGenres)
+	router.GET("/api/movies", movies.GetMovies)
 
 	router.Run(appPort)
 }
