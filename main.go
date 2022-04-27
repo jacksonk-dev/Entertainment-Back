@@ -10,18 +10,31 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var config globals.Config = globals.GetConfig()
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", config.CLIENT_ORIGIN)
+		// c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT")
+
+		c.Next()
+	}
+}
+
 func main() {
-	config := globals.GetConfig()
 	PORT := fmt.Sprintf(":%s", config.PORT)
 
 	router := gin.Default()
+	router.Use(CORSMiddleware())
 
-	router.GET("/api", func(c *gin.Context) {
+	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": "Hello"})
 	})
-	router.GET("/api/genres", movies.GetMovieGenres)
-	router.GET("/api/movies", movies.GetMovies)
-	router.GET("/api/movie-image", movies.GetMovieImage)
+	router.GET("/genres", movies.GetMovieGenres)
+	router.GET("/movies", movies.GetMovies)
+	router.GET("/movie-image", movies.GetMovieImage)
 
 	router.Run(PORT)
 }

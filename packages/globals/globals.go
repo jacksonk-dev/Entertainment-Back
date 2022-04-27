@@ -10,6 +10,7 @@ type Config struct {
 	PORT          string
 	TMDB_API_KEY  string
 	TRAKT_API_KEY string
+	CLIENT_ORIGIN string
 }
 
 func GetConfig() Config {
