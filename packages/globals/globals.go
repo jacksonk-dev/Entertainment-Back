@@ -13,16 +13,20 @@ type Config struct {
 	CLIENT_ORIGIN string
 }
 
-func GetConfig() Config {
-	var config Config
+type EnvVariables struct {
+	EnvVars Config `mapstructure:"env_variables"`
+}
 
-	viper.SetConfigFile(".env")
+func GetConfig() Config {
+	var envVariables EnvVariables
+
+	viper.SetConfigFile("app.yaml")
 	viper.ReadInConfig()
 
-	err := viper.Unmarshal(&config)
+	err := viper.Unmarshal(&envVariables)
 	if err != nil {
 		fmt.Println("Error: Unable to unmarshal")
 	}
 
-	return config
+	return envVariables.EnvVars
 }
