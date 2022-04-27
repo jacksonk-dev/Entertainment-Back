@@ -1,7 +1,9 @@
 package main
 
 import (
+	"H2EBack/packages/globals"
 	"H2EBack/packages/movies"
+	"fmt"
 
 	"net/http"
 
@@ -9,8 +11,10 @@ import (
 )
 
 func main() {
+	config := globals.GetConfig()
+	PORT := fmt.Sprintf(":%s", config.PORT)
+
 	router := gin.Default()
-	const appPort string = ":8082"
 
 	router.GET("/api", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": "Hello"})
@@ -19,5 +23,5 @@ func main() {
 	router.GET("/api/movies", movies.GetMovies)
 	router.GET("/api/movie-image", movies.GetMovieImage)
 
-	router.Run(appPort)
+	router.Run(PORT)
 }

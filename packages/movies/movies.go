@@ -1,6 +1,8 @@
 package movies
 
 import (
+	"H2EBack/packages/globals"
+
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,6 +11,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+var config globals.Config = globals.GetConfig()
 
 type Genre struct {
 	Label string `json:"name"`
@@ -23,9 +27,16 @@ type TraktIDs struct {
 }
 
 type ActualMovie struct {
-	Title string   `json:"title"`
-	Year  string   `json:"year"`
-	IDs   TraktIDs `json:"ids"`
+	Title    string   `json:"title"`
+	Year     int      `json:"year"`
+	IDs      TraktIDs `json:"ids"`
+	Tagline  string   `json:"tagline"`
+	Overview string   `json:"overview"`
+	Released string   `json:"released"`
+	Runtime  int      `json:"runtime"`
+	Trailer  string   `json:"trailer"`
+	Status   string   `json:"status"`
+	Rating   float64  `json:"rating"`
 }
 type Movie struct {
 	Watchers int         `json:"watchers"`
@@ -47,7 +58,7 @@ var imageData ImageData
 func addTraktHeadersToRequest(req *http.Request) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("trakt-api-version", "2")
-	req.Header.Add("trakt-api-key", "97d2684afdbb32dc5306041308ad7b334c1616a124c77afb58e73eec6dc02342")
+	req.Header.Add("trakt-api-key", config.TRAKT_API_KEY)
 }
 
 func addMovieFetchParams(params *url.Values, genres, page string) {
@@ -76,6 +87,7 @@ func GetMovieGenres(c *gin.Context) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
+
 	json.Unmarshal(bodyBytes, &genres)
 
 	c.IndentedJSON(http.StatusOK, genres)
@@ -120,10 +132,7 @@ func GetMovieImage(c *gin.Context) {
 	client := &http.Client{}
 	paramsMap := c.Request.URL.Query()
 
-	var tmdbKey string = "8f483886b324420ebe137ca5914f046c"
-
-	var url string = fmt.Sprintf("https://api.themoviedb.org/3/find/%s?api_key=%s&language=en-US&external_source=imdb_id", paramsMap.Get("id"), tmdbKey)
-
+	var url string = fmt.Sprintf("https://api.themoviedb.org/3/find/%s?api_key=%s&language=en-US&external_source=imdb_id", paramsMap.Get("id"), config.TMDB_API_KEY)
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
@@ -140,6 +149,7 @@ func GetMovieImage(c *gin.Context) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
+
 	json.Unmarshal(bodyBytes, &imageData)
 
 	c.IndentedJSON(http.StatusOK, imageData)
