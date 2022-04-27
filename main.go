@@ -3,8 +3,8 @@ package main
 import (
 	"H2EBack/packages/globals"
 	"H2EBack/packages/movies"
-	"fmt"
 
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
