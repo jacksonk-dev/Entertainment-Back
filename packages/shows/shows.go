@@ -26,6 +26,16 @@ type TraktIDs struct {
 	TMDB  int    `json:"tmdb"`
 }
 
+type TMDBTv struct {
+	Title         string `json:"name"`
+	OriginalTitle string `json:"original_name"`
+	PosterPath    string `json:"poster_path"`
+}
+
+type TMDBResults struct {
+	Page    int      `json:"page"`
+	Results []TMDBTv `json:"results"`
+}
 type ActualShow struct {
 	Title      string   `json:"title"`
 	Year       int      `json:"year"`
@@ -90,6 +100,33 @@ func GetGenres(c *gin.Context) {
 	json.Unmarshal(bodyBytes, &genres)
 
 	c.IndentedJSON(http.StatusOK, genres)
+}
+
+func GetTrendingShows(c *gin.Context) {
+	client := &http.Client{}
+
+	var url string = fmt.Sprintf("https://api.themoviedb.org/3/trending/tv/day?api_key=%s", config.TMDB_API_KEY)
+	req, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	defer resp.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	var fetchResults TMDBResults
+	json.Unmarshal(bodyBytes, &fetchResults)
+
+	c.IndentedJSON(http.StatusOK, fetchResults.Results)
 }
 
 func GetShows(c *gin.Context) {
