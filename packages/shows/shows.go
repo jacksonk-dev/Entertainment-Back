@@ -129,6 +129,34 @@ func GetTrendingShows(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, fetchResults.Results)
 }
 
+func GetTMDBShows(c *gin.Context) {
+	client := &http.Client{}
+	paramsMap := c.Request.URL.Query()
+
+	var url string = fmt.Sprintf("https://api.themoviedb.org/3/tv/%s?api_key=%s&language=en-US&page=%s", paramsMap.Get("list"), config.TMDB_API_KEY, paramsMap.Get("page"))
+	req, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	defer resp.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	var fetchResults TMDBResults
+	json.Unmarshal(bodyBytes, &fetchResults)
+
+	c.IndentedJSON(http.StatusOK, fetchResults.Results)
+}
+
 func GetShows(c *gin.Context) {
 	client := &http.Client{}
 	paramsMap := c.Request.URL.Query()

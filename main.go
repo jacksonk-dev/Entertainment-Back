@@ -34,16 +34,19 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"data": "Hello"})
 	})
 
+	// TMDB
 	router.GET("/trending-movies", movies.GetTrendingMovies)
 	router.GET("/trending-shows", shows.GetTrendingShows)
+	router.GET("/get-movies", movies.GetTMDBMovies)
+	router.GET("/get-shows", shows.GetTMDBShows)
+	router.GET("/movie-image", movies.GetImage)
+	router.GET("/show-image", shows.GetImage)
 
+	// Trakt
 	router.GET("/movie-genres", movies.GetGenres)
 	router.GET("/movies", movies.GetMovies)
-	router.GET("/movie-image", movies.GetImage)
-
 	router.GET("/show-genres", shows.GetGenres)
 	router.GET("/shows", shows.GetShows)
-	router.GET("/show-image", shows.GetImage)
 
 	router.Run(PORT)
 }
