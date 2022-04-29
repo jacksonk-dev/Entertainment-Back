@@ -1,4 +1,4 @@
-package movies
+package shows
 
 import (
 	"H2EBack/packages/globals"
@@ -26,21 +26,20 @@ type TraktIDs struct {
 	TMDB  int    `json:"tmdb"`
 }
 
-type ActualMovie struct {
-	Title    string   `json:"title"`
-	Year     int      `json:"year"`
-	IDs      TraktIDs `json:"ids"`
-	Tagline  string   `json:"tagline"`
-	Overview string   `json:"overview"`
-	Released string   `json:"released"`
-	Runtime  int      `json:"runtime"`
-	Trailer  string   `json:"trailer"`
-	Status   string   `json:"status"`
-	Rating   float64  `json:"rating"`
+type ActualShow struct {
+	Title      string   `json:"title"`
+	Year       int      `json:"year"`
+	IDs        TraktIDs `json:"ids"`
+	Overview   string   `json:"overview"`
+	FirstAired string   `json:"first_aired"`
+	Runtime    int      `json:"runtime"`
+	Trailer    string   `json:"trailer"`
+	Status     string   `json:"status"`
+	Rating     float64  `json:"rating"`
 }
-type Movie struct {
-	Watchers int         `json:"watchers"`
-	Movie    ActualMovie `json:"movie"`
+type Show struct {
+	Watchers int        `json:"watchers"`
+	Show     ActualShow `json:"show"`
 }
 
 type SingleImageData struct {
@@ -48,11 +47,11 @@ type SingleImageData struct {
 }
 
 type ImageData struct {
-	MovieResults []SingleImageData `json:"movie_results"`
+	ShowResults []SingleImageData `json:"tv_results"`
 }
 
 var genres []Genre
-var movies []Movie
+var shows []Show
 var imageData ImageData
 
 func addTraktHeadersToRequest(req *http.Request) {
@@ -61,7 +60,7 @@ func addTraktHeadersToRequest(req *http.Request) {
 	req.Header.Add("trakt-api-key", config.TRAKT_API_KEY)
 }
 
-func addMovieFetchParams(params *url.Values, genres, page string) {
+func addShowFetchParams(params *url.Values, genres, page string) {
 	params.Add("limit", "30")
 	params.Add("page", page)
 	params.Add("genres", genres)
@@ -70,7 +69,7 @@ func addMovieFetchParams(params *url.Values, genres, page string) {
 
 func GetGenres(c *gin.Context) {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", "https://api.trakt.tv/genres/movies", nil)
+	req, err := http.NewRequest("GET", "https://api.trakt.tv/genres/shows", nil)
 	addTraktHeadersToRequest(req)
 
 	if err != nil {
@@ -93,16 +92,16 @@ func GetGenres(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, genres)
 }
 
-func GetMovies(c *gin.Context) {
+func GetShows(c *gin.Context) {
 	client := &http.Client{}
 	paramsMap := c.Request.URL.Query()
 
-	base, err := url.Parse("https://api.trakt.tv/movies/" + paramsMap.Get("subLink"))
+	base, err := url.Parse("https://api.trakt.tv/shows/" + paramsMap.Get("subLink"))
 	if err != nil {
 		return
 	}
 	params := url.Values{}
-	addMovieFetchParams(&params, paramsMap.Get("genres"), paramsMap.Get("page"))
+	addShowFetchParams(&params, paramsMap.Get("genres"), paramsMap.Get("page"))
 
 	base.RawQuery = params.Encode()
 
@@ -123,9 +122,9 @@ func GetMovies(c *gin.Context) {
 	if err != nil {
 		fmt.Print(err.Error())
 	}
-	json.Unmarshal(bodyBytes, &movies)
+	json.Unmarshal(bodyBytes, &shows)
 
-	c.IndentedJSON(http.StatusOK, movies)
+	c.IndentedJSON(http.StatusOK, shows)
 }
 
 func GetImage(c *gin.Context) {

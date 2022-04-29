@@ -3,6 +3,7 @@ package main
 import (
 	"H2EBack/packages/globals"
 	"H2EBack/packages/movies"
+	"H2EBack/packages/shows"
 
 	"fmt"
 	"net/http"
@@ -32,9 +33,14 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"data": "Hello"})
 	})
-	router.GET("/genres", movies.GetMovieGenres)
+
+	router.GET("/movie-genres", movies.GetGenres)
 	router.GET("/movies", movies.GetMovies)
-	router.GET("/movie-image", movies.GetMovieImage)
+	router.GET("/movie-image", movies.GetImage)
+
+	router.GET("/show-genres", shows.GetGenres)
+	router.GET("/shows", shows.GetShows)
+	router.GET("/show-image", shows.GetImage)
 
 	router.Run(PORT)
 }
