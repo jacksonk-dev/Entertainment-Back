@@ -4,6 +4,7 @@ import (
 	"H2EBack/packages/globals"
 	"H2EBack/packages/movies"
 	"H2EBack/packages/shows"
+	"os"
 
 	"fmt"
 	"net/http"
@@ -11,11 +12,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var config globals.Config = globals.GetConfig()
-
 func CORSMiddleware() gin.HandlerFunc {
+	var clientOrigin string = os.Getenv("CLIENT_ORIGIN")
+
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", config.CLIENT_ORIGIN)
+		c.Writer.Header().Set("Access-Control-Allow-Origin", clientOrigin)
 		// c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT")
@@ -25,7 +26,11 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 func main() {
-	PORT := fmt.Sprintf(":%s", config.PORT)
+	var port string = os.Getenv("PORT")
+	if port == "" {
+		globals.SetConfig()
+		port = os.Getenv("PORT")
+	}
 
 	router := gin.Default()
 	router.Use(CORSMiddleware())
@@ -48,5 +53,5 @@ func main() {
 	router.GET("/show-genres", shows.GetGenres)
 	router.GET("/shows", shows.GetShows)
 
-	router.Run(PORT)
+	router.Run(fmt.Sprintf(":%s", port))
 }

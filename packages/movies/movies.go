@@ -1,7 +1,7 @@
 package movies
 
 import (
-	"H2EBack/packages/globals"
+	"os"
 
 	"encoding/json"
 	"fmt"
@@ -11,8 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-var config globals.Config = globals.GetConfig()
 
 type Genre struct {
 	Label string `json:"name"`
@@ -68,7 +66,7 @@ var imageData ImageData
 func addTraktHeadersToRequest(req *http.Request) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("trakt-api-version", "2")
-	req.Header.Add("trakt-api-key", config.TRAKT_API_KEY)
+	req.Header.Add("trakt-api-key", os.Getenv("TRAKT_API_KEY"))
 }
 
 func addMovieFetchParams(params *url.Values, genres, page string) {
@@ -106,7 +104,7 @@ func GetGenres(c *gin.Context) {
 func GetTrendingMovies(c *gin.Context) {
 	client := &http.Client{}
 
-	var url string = fmt.Sprintf("https://api.themoviedb.org/3/trending/movie/day?api_key=%s", config.TMDB_API_KEY)
+	var url string = fmt.Sprintf("https://api.themoviedb.org/3/trending/movie/day?api_key=%s", os.Getenv("TMDB_API_KEY"))
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
@@ -134,7 +132,7 @@ func GetTMDBMovies(c *gin.Context) {
 	client := &http.Client{}
 	paramsMap := c.Request.URL.Query()
 
-	var url string = fmt.Sprintf("https://api.themoviedb.org/3/movie/%s?api_key=%s&language=en-US&page=%s", paramsMap.Get("list"), config.TMDB_API_KEY, paramsMap.Get("page"))
+	var url string = fmt.Sprintf("https://api.themoviedb.org/3/movie/%s?api_key=%s&language=en-US&page=%s", paramsMap.Get("list"), os.Getenv("TMDB_API_KEY"), paramsMap.Get("page"))
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
@@ -197,7 +195,7 @@ func GetImage(c *gin.Context) {
 	client := &http.Client{}
 	paramsMap := c.Request.URL.Query()
 
-	var url string = fmt.Sprintf("https://api.themoviedb.org/3/find/%s?api_key=%s&language=en-US&external_source=imdb_id", paramsMap.Get("id"), config.TMDB_API_KEY)
+	var url string = fmt.Sprintf("https://api.themoviedb.org/3/find/%s?api_key=%s&language=en-US&external_source=imdb_id", paramsMap.Get("id"), os.Getenv("TMDB_API_KEY"))
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {

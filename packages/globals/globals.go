@@ -2,6 +2,7 @@ package globals
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -17,10 +18,10 @@ type EnvVariables struct {
 	EnvVars Config `mapstructure:"env_variables"`
 }
 
-func GetConfig() Config {
+func SetConfig() {
 	var envVariables EnvVariables
 
-	viper.SetConfigFile("app.dev.yaml")
+	viper.SetConfigFile("app.yaml")
 	viper.ReadInConfig()
 
 	err := viper.Unmarshal(&envVariables)
@@ -28,5 +29,8 @@ func GetConfig() Config {
 		fmt.Println("Error: Unable to unmarshal")
 	}
 
-	return envVariables.EnvVars
+	os.Setenv("PORT", envVariables.EnvVars.PORT)
+	os.Setenv("CLIENT_ORIGIN", envVariables.EnvVars.CLIENT_ORIGIN)
+	os.Setenv("TMDB_API_KEY", envVariables.EnvVars.TMDB_API_KEY)
+	os.Setenv("TRAKT_API_KEY", envVariables.EnvVars.TRAKT_API_KEY)
 }
