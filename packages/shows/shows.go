@@ -25,9 +25,14 @@ type TraktIDs struct {
 }
 
 type TMDBTv struct {
-	Title         string `json:"name"`
-	OriginalTitle string `json:"original_name"`
-	PosterPath    string `json:"poster_path"`
+	Title         string      `json:"name"`
+	OriginalTitle string      `json:"original_name"`
+	PosterPath    string      `json:"poster_path"`
+	Overview      string      `json:"overview"`
+	ReleaseDate   string      `json:"release_date"`
+	Popularity    json.Number `json:"popularity"`
+	VoteCount     int         `json:"vote_count"`
+	VoteAverage   json.Number `json:"vote_average"`
 }
 
 type TMDBResults struct {
