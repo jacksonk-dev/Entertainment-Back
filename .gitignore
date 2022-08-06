@@ -1,3 +1,6 @@
 .env
 app.dev.yaml
 app.yaml
+
+# Executables
+H2EBack.exe
