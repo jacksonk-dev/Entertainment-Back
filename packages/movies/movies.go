@@ -25,9 +25,14 @@ type TraktIDs struct {
 }
 
 type TMDBMovie struct {
-	Title         string `json:"title"`
-	OriginalTitle string `json:"original_title"`
-	PosterPath    string `json:"poster_path"`
+	Title         string      `json:"title"`
+	OriginalTitle string      `json:"original_title"`
+	PosterPath    string      `json:"poster_path"`
+	Overview      string      `json:"overview"`
+	ReleaseDate   string      `json:"release_date"`
+	Popularity    json.Number `json:"popularity"`
+	VoteCount     int         `json:"vote_count"`
+	VoteAverage   json.Number `json:"vote_average"`
 }
 
 type TMDBResults struct {
@@ -117,13 +122,13 @@ func GetTrendingMovies(c *gin.Context) {
 	}
 
 	defer resp.Body.Close()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Print(err.Error())
 	}
 
 	var fetchResults TMDBResults
-	json.Unmarshal(bodyBytes, &fetchResults)
+	json.Unmarshal(body, &fetchResults)
 
 	c.IndentedJSON(http.StatusOK, fetchResults.Results)
 }
