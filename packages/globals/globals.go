@@ -21,7 +21,7 @@ type EnvVariables struct {
 func SetConfig() {
 	var envVariables EnvVariables
 
-	viper.SetConfigFile("app.yaml")
+	viper.SetConfigFile("app.dev.yaml")
 	viper.ReadInConfig()
 
 	err := viper.Unmarshal(&envVariables)
