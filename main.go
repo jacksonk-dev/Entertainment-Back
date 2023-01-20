@@ -1,9 +1,9 @@
 package main
 
 import (
-	"H2EBack/packages/globals"
-	"H2EBack/packages/movies"
-	"H2EBack/packages/shows"
+	"EntertainmentBack/packages/globals"
+	"EntertainmentBack/packages/movies"
+	"EntertainmentBack/packages/shows"
 	"os"
 
 	"fmt"

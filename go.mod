@@ -1,4 +1,4 @@
-module H2EBack
+module EntertainmentBack
 
 go 1.17
 
