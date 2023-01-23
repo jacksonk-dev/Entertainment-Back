@@ -40,6 +40,16 @@ type TMDBMovie struct {
 	VoteAverage   json.Number `json:"vote_average"`
 }
 
+type ImageProperties struct {
+	AspectRatio json.Number `json:"aspect_ratio"`
+	FilePath    string      `json:"file_path"`
+}
+
+type MovieImages struct {
+	Backdrops []ImageProperties `json:"backdrops"`
+	Posters   []ImageProperties `json:"posters"`
+}
+
 type TMDBResults struct {
 	Page       int         `json:"page"`
 	TMDBMovies []TMDBMovie `json:"results"`
@@ -193,6 +203,34 @@ func GetTMDBMovie(c *gin.Context) {
 	json.Unmarshal(bodyBytes, &movie)
 
 	c.IndentedJSON(http.StatusOK, movie)
+}
+
+func GetImages(c *gin.Context) {
+	client := &http.Client{}
+
+	var url string = fmt.Sprintf("https://api.themoviedb.org/3/movie/%s/images?api_key=%s", c.Param("movieId"), os.Getenv("TMDB_API_KEY"))
+	req, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	defer resp.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	var images MovieImages
+	fmt.Println(images)
+	json.Unmarshal(bodyBytes, &images)
+
+	c.IndentedJSON(http.StatusOK, images)
 }
 
 func GetMovies(c *gin.Context) {

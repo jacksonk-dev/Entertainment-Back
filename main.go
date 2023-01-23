@@ -46,6 +46,7 @@ func main() {
 	router.GET("/get-tmdb-movie/:movieId", movies.GetTMDBMovie)
 	router.GET("/get-shows", shows.GetTMDBShows)
 	router.GET("/movie-image", movies.GetImage)
+	router.GET("/movie-images/:movieId", movies.GetImages)
 	router.GET("/show-image", shows.GetImage)
 
 	// Trakt
