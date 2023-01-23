@@ -25,20 +25,26 @@ type TraktIDs struct {
 }
 
 type TMDBMovie struct {
+	Id            int         `json:"id"`
+	Budget        int         `json:"budget"`
+	BackdropPath  string      `json:"backdrop_path"`
 	Title         string      `json:"title"`
 	OriginalTitle string      `json:"original_title"`
 	PosterPath    string      `json:"poster_path"`
 	Overview      string      `json:"overview"`
 	ReleaseDate   string      `json:"release_date"`
+	Runtime       int         `json:"runtime"`
+	Status        string      `json:"status"`
 	Popularity    json.Number `json:"popularity"`
 	VoteCount     int         `json:"vote_count"`
 	VoteAverage   json.Number `json:"vote_average"`
 }
 
 type TMDBResults struct {
-	Page    int         `json:"page"`
-	Results []TMDBMovie `json:"results"`
+	Page       int         `json:"page"`
+	TMDBMovies []TMDBMovie `json:"results"`
 }
+
 type ActualMovie struct {
 	Title    string   `json:"title"`
 	Year     int      `json:"year"`
@@ -130,7 +136,7 @@ func GetTrendingMovies(c *gin.Context) {
 	var fetchResults TMDBResults
 	json.Unmarshal(body, &fetchResults)
 
-	c.IndentedJSON(http.StatusOK, fetchResults.Results)
+	c.IndentedJSON(http.StatusOK, fetchResults.TMDBMovies)
 }
 
 func GetTMDBMovies(c *gin.Context) {
@@ -158,7 +164,35 @@ func GetTMDBMovies(c *gin.Context) {
 	var fetchResults TMDBResults
 	json.Unmarshal(bodyBytes, &fetchResults)
 
-	c.IndentedJSON(http.StatusOK, fetchResults.Results)
+	c.IndentedJSON(http.StatusOK, fetchResults.TMDBMovies)
+}
+
+func GetTMDBMovie(c *gin.Context) {
+	client := &http.Client{}
+
+	var url string = fmt.Sprintf("https://api.themoviedb.org/3/movie/%s?api_key=%s&language=en-US", c.Param("movieId"), os.Getenv("TMDB_API_KEY"))
+	req, err := http.NewRequest("GET", url, nil)
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	defer resp.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	var movie TMDBMovie
+
+	json.Unmarshal(bodyBytes, &movie)
+
+	c.IndentedJSON(http.StatusOK, movie)
 }
 
 func GetMovies(c *gin.Context) {

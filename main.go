@@ -43,6 +43,7 @@ func main() {
 	router.GET("/trending-movies", movies.GetTrendingMovies)
 	router.GET("/trending-shows", shows.GetTrendingShows)
 	router.GET("/get-movies", movies.GetTMDBMovies)
+	router.GET("/get-tmdb-movie/:movieId", movies.GetTMDBMovie)
 	router.GET("/get-shows", shows.GetTMDBShows)
 	router.GET("/movie-image", movies.GetImage)
 	router.GET("/show-image", shows.GetImage)
