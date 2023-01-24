@@ -27,6 +27,7 @@ type TraktIDs struct {
 type TMDBMovie struct {
 	Id            int         `json:"id"`
 	Budget        int         `json:"budget"`
+	Revenue       int         `json:"revenue"`
 	BackdropPath  string      `json:"backdrop_path"`
 	Title         string      `json:"title"`
 	OriginalTitle string      `json:"original_title"`
