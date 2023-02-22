@@ -39,6 +39,7 @@ type TMDBMovie struct {
 	Popularity    json.Number `json:"popularity"`
 	VoteCount     int         `json:"vote_count"`
 	VoteAverage   json.Number `json:"vote_average"`
+	Tagline       string      `json:"tagline"`
 }
 
 type ImageProperties struct {
